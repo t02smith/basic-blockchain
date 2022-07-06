@@ -3,7 +3,6 @@ package blockchain
 import (
 	"bytes"
 	"crypto/sha256"
-	"log"
 	"math"
 	"math/big"
 )
@@ -24,7 +23,7 @@ func RunProofOfWork(pow *ProofOfWork) (int, []byte) {
 		data := CreateNonce(pow, nonce)
 		hash = sha256.Sum256(data)
 
-		log.Printf("%x\n", hash)
+		//log.Printf("%x\n", hash)
 		intHash.SetBytes(hash[:])
 
 		if intHash.Cmp(pow.Target) == -1 {
@@ -34,7 +33,6 @@ func RunProofOfWork(pow *ProofOfWork) (int, []byte) {
 		}
 	}
 
-	log.Println()
 	return nonce, hash[:]
 }
 

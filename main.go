@@ -1,19 +1,21 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/t02smith/basic-blockchain/blockchain"
+	"github.com/t02smith/basic-blockchain/cli"
 )
 
 func main() {
+	defer os.Exit(0)
+
 	chain := blockchain.CreateBlockChain()
+	defer chain.Database.Close()
 
-	chain.GenerateBlock("hello world")
-	chain.GenerateBlock("boobies")
-	chain.GenerateBlock("general kenobi")
-
-	for _, block := range chain.Blocks {
-		fmt.Printf("%x -> %x:\n %s\n\n", block.PrevHash, block.Hash, block.Data)
+	cli := cli.CommandLine{
+		Blockchain: chain,
 	}
+
+	cli.Run()
 }

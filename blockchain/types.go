@@ -1,6 +1,10 @@
 package blockchain
 
-import "math/big"
+import (
+	"math/big"
+
+	"github.com/dgraph-io/badger"
+)
 
 type Block struct {
 	Hash     []byte
@@ -10,7 +14,13 @@ type Block struct {
 }
 
 type BlockChain struct {
-	Blocks []*Block
+	LastHash []byte
+	Database *badger.DB
+}
+
+type BlockChainIterator struct {
+	CurrentHash []byte
+	Database    *badger.DB
 }
 
 type ProofOfWork struct {

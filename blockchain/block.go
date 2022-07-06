@@ -1,5 +1,10 @@
 package blockchain
 
+import (
+	"bytes"
+	"encoding/gob"
+)
+
 // methods
 
 // static
@@ -20,4 +25,26 @@ func CreateBlock(data string, prevHash []byte) *Block {
 	block.Nonce = nonce
 
 	return block
+}
+
+// IO
+
+func (b *Block) Serialize() []byte {
+	var res bytes.Buffer
+	encoder := gob.NewEncoder(&res)
+
+	err := encoder.Encode(b)
+	Handle(err)
+
+	return res.Bytes()
+}
+
+func Deserialize(data []byte) *Block {
+	var b Block
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+
+	err := decoder.Decode(&b)
+	Handle(err)
+
+	return &b
 }
