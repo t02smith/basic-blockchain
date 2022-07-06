@@ -1,5 +1,7 @@
 package blockchain
 
+import "log"
+
 // methods
 
 // returns the most recent node in the blockchain
@@ -14,6 +16,7 @@ func (chain *BlockChain) pushBlock(block *Block) {
 
 // generates and adds a new block to the blockchain
 func (chain *BlockChain) GenerateBlock(data string) {
+	log.Printf("Generating block: %s\n", data)
 	head := chain.Head()
 	next := CreateBlock(data, head.Hash)
 	chain.pushBlock(next)

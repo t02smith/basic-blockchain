@@ -1,17 +1,6 @@
 package blockchain
 
-import (
-	"bytes"
-	"crypto/sha256"
-)
-
 // methods
-
-// Generates the hash for a block
-func (b *Block) HashBlock() {
-	hash := sha256.Sum256(bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{}))
-	b.Hash = hash[:]
-}
 
 // static
 
@@ -21,8 +10,14 @@ func CreateBlock(data string, prevHash []byte) *Block {
 		Hash:     []byte{},
 		Data:     []byte(data),
 		PrevHash: prevHash,
+		Nonce:    0,
 	}
 
-	block.HashBlock()
+	pow := CreateProofOfWork(block)
+	nonce, hash := RunProofOfWork(pow)
+
+	block.Hash = hash[:]
+	block.Nonce = nonce
+
 	return block
 }

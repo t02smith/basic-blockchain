@@ -11,6 +11,7 @@ func main() {
 
 	chain.GenerateBlock("hello world")
 	chain.GenerateBlock("boobies")
+	chain.GenerateBlock("general kenobi")
 
 	for _, block := range chain.Blocks {
 		fmt.Printf("%x -> %x:\n %s\n\n", block.PrevHash, block.Hash, block.Data)
