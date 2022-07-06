@@ -57,6 +57,7 @@ func CreateBlockChain() *BlockChain {
 	// open connection to db
 	var prevHash []byte
 	ops := badger.DefaultOptions(DB_PATH)
+	ops.Logger = nil
 
 	db, err := badger.Open(ops)
 	Handle(err)

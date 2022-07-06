@@ -3,11 +3,13 @@ package blockchain
 import (
 	"bytes"
 	"crypto/sha256"
+	"log"
 	"math"
 	"math/big"
+	"time"
 )
 
-const DIFFICULTY = 15
+const DIFFICULTY = 20
 
 // methods
 
@@ -15,6 +17,8 @@ const DIFFICULTY = 15
 
 // runs the proof of work function to find the nonce + hash
 func RunProofOfWork(pow *ProofOfWork) (int, []byte) {
+	log.Println("Running proof of work")
+	start := time.Now()
 	var intHash big.Int
 	var hash [32]byte
 
@@ -23,7 +27,7 @@ func RunProofOfWork(pow *ProofOfWork) (int, []byte) {
 		data := CreateNonce(pow, nonce)
 		hash = sha256.Sum256(data)
 
-		//log.Printf("%x\n", hash)
+		log.Printf("%x\n", hash)
 		intHash.SetBytes(hash[:])
 
 		if intHash.Cmp(pow.Target) == -1 {
@@ -33,6 +37,7 @@ func RunProofOfWork(pow *ProofOfWork) (int, []byte) {
 		}
 	}
 
+	log.Printf("Proof of work finished in %fs\n", time.Since(start).Seconds())
 	return nonce, hash[:]
 }
 
