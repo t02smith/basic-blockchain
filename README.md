@@ -4,20 +4,23 @@ A basic proof of work blockchain based upon [this guide](https://dev.to/nheindev
 
 ![Go Badge](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=fff&style=for-the-badge)
 
+## Installation
+
+```bash
+# 1. clone the repository
+git clone https://github.com/t02smith/basic-blockchain.git
+
+# 2. build the application
+go install github.com/t02smith/basic-blockchain
+```
+
 ## Command Line Interface
 
-Commands can be run from the terminal using:
+Cobra is used to implement the CLI and you can find out
+ more about the commands by running:
 
 ```bash
-go run main.go <COMMAND>
+basic-blockchain --help
 ```
 
-Below is the list of available commands:
-
-```bash
-# Add a new block the the blockchain
-add -block <BLOCK DATA>
-
-# Print out the blockchain
-print
-```
+> *NOTE: remember to add $GOPATH/bin to $PATH* 
