@@ -9,21 +9,50 @@ import (
 
 func (cli *CommandLine) printUsage() {
 	fmt.Println("Commands:")
-	fmt.Println(" add -block <BLOCK DATA>  - add a block to the chain")
-	fmt.Println(" print 				   - prints the blocks in the chain")
+	fmt.Println("getbalance -address ADDRESS = get balance for ADDRESS")
+	fmt.Println("createblockchain -address ADDRESS creates a blockchain and rewards the mining fee")
+	fmt.Println("printchain - Prints the blocks in the chain")
+	fmt.Println("send -from FROM -to TO -amount AMOUNT - Send amount of coins from one address to another")
 }
 
-func (cli *CommandLine) addBlock(data string) {
-	cli.Blockchain.GenerateBlock(data)
-	fmt.Printf("Block added: %s\n", data)
+func (cli *CommandLine) createBlockChain(address string) {
+	newChain := blockchain.CreateBlockChain(address)
+	newChain.Database.Close()
+	fmt.Println("Created new BlockChain")
+}
+
+func (cli *CommandLine) getBalance(address string) {
+	chain := blockchain.ContinueBlockChain(address)
+	defer chain.Database.Close()
+
+	balance := 0
+	UTXOs := chain.FindUTXOs(address)
+
+	for _, out := range UTXOs {
+		balance += out.Value
+	}
+
+	fmt.Printf("Balance of %s: %d\n", address, balance)
+}
+
+func (cli *CommandLine) send(from, to string, amount int) {
+	chain := blockchain.ContinueBlockChain(from)
+	defer chain.Database.Close()
+
+	txn := blockchain.NewTransaction(from, to, amount, chain)
+	chain.GenerateBlock([]*blockchain.Transaction{txn})
+	fmt.Println("Success!")
 }
 
 func (cli *CommandLine) printChain() {
-	it := cli.Blockchain.Iterator()
+	chain := blockchain.ContinueBlockChain("")
+	defer chain.Database.Close()
+
+	it := chain.Iterator()
 
 	for {
 		block := it.Next()
-		fmt.Printf("%x -> %x:\n %s\n", block.PrevHash, block.Hash, block.Data)
+		fmt.Printf("%x -> %x:\n", block.PrevHash, block.Hash)
 		pow := blockchain.CreateProofOfWork(block)
 		fmt.Printf("PoW: %s\n\n", strconv.FormatBool(blockchain.ValidateProofOfWork(pow)))
 

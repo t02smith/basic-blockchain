@@ -6,6 +6,16 @@ import (
 	"log"
 )
 
+// CONSTANTS
+
+const (
+	DB_PATH      string = "./tmp/blocks"
+	DB_FILE      string = "./tmp/blocks/MANIFEST"
+	GENESIS_DATA string = "TXN #1"
+)
+
+// FUNCTIONS
+
 func ToHex(num int64) []byte {
 	buff := new(bytes.Buffer)
 	err := binary.Write(buff, binary.BigEndian, num)

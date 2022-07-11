@@ -10,12 +10,12 @@ import (
 // static
 
 // generates a new block
-func CreateBlock(data string, prevHash []byte) *Block {
+func CreateBlock(txns []*Transaction, prevHash []byte) *Block {
 	block := &Block{
-		Hash:     []byte{},
-		Data:     []byte(data),
-		PrevHash: prevHash,
-		Nonce:    0,
+		Hash:         []byte{},
+		Transactions: txns,
+		PrevHash:     prevHash,
+		Nonce:        0,
 	}
 
 	pow := CreateProofOfWork(block)

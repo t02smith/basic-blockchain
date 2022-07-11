@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const DIFFICULTY = 20
+const DIFFICULTY = 10
 
 // methods
 
@@ -56,7 +56,7 @@ func CreateNonce(pow *ProofOfWork, nonce int) []byte {
 	data := bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
-			pow.Block.Data,
+			pow.Block.HashTransactions(),
 			ToHex(int64(nonce)),
 			ToHex(int64(DIFFICULTY)),
 		},
