@@ -16,11 +16,27 @@ go install github.com/t02smith/basic-blockchain
 
 ## Command Line Interface
 
-Cobra is used to implement the CLI and you can find out
+**[Cobra](https://github.com/spf13/cobra)** is used to implement the CLI and you can find out
  more about the commands by running:
 
 ```bash
 basic-blockchain --help
 ```
 
-> *NOTE: remember to add $GOPATH/bin to $PATH* 
+```bash
+A proof of work blockchain based upon the guide by Noah Hein.
+
+Usage:
+  basic-blockchain [command]
+
+Available Commands:
+  balance     Get the balance at an address
+  completion  Generate the autocompletion script for the specified shell
+  create      Create a new blockchain
+  help        Help about any command
+  send        Send currency from one account to another
+  show        Print the blockchain
+
+Flags:
+  -h, --help   help for basic-blockchain
+```

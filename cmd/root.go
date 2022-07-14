@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
@@ -17,9 +13,6 @@ var rootCmd = &cobra.Command{
 	Use:   "basic-blockchain",
 	Short: "A basic proof of work blockchain",
 	Long:  `A proof of work blockchain based upon the guide by Noah Hein.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 func Execute() {
@@ -27,9 +20,4 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func init() {
-
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
