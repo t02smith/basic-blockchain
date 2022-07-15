@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/t02smith/basic-blockchain/blockchain"
+	"github.com/t02smith/basic-blockchain/wallet"
 )
+
+var balanceAddress string
 
 // balanceCmd represents the balance command
 var balanceCmd = &cobra.Command{
@@ -13,27 +15,22 @@ var balanceCmd = &cobra.Command{
 	Short: "Get the balance at an address",
 	Long:  `Finds the total amount of unspent output from a given address' transactions.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		getBalance(address)
+		if balanceAddress == "" {
+			balanceAddress, _ = promptAddress("Choose an address to check the balance of:")
+		}
+
+		getBalance(balanceAddress)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(balanceCmd)
 
-	balanceCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "Address to check balance of")
-	balanceCmd.MarkPersistentFlagRequired("address")
+	balanceCmd.PersistentFlags().StringVarP(&balanceAddress, "address", "a", "", "Address to check balance of")
 }
 
 func getBalance(address string) {
-	chain := blockchain.ContinueBlockChain(address)
-	defer chain.Database.Close()
-
-	balance := 0
-	UTXOs := chain.FindUTXOs(address)
-
-	for _, out := range UTXOs {
-		balance += out.Value
-	}
+	balance := wallet.GetBalance(address)
 
 	fmt.Printf("Balance of %s: %d\n", address, balance)
 }

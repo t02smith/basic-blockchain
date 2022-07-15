@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"log"
 
+	"github.com/t02smith/basic-blockchain/blockchain"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -64,4 +65,18 @@ func Checksum(ripeMdHash []byte) []byte {
 	secondHash := sha256.Sum256(firstHash[:])
 
 	return secondHash[:checksumLength]
+}
+
+func GetBalance(address string) int {
+	chain := blockchain.ContinueBlockChain(address)
+	defer chain.Database.Close()
+
+	balance := 0
+	UTXOs := chain.FindUTXOs(address)
+
+	for _, out := range UTXOs {
+		balance += out.Value
+	}
+
+	return balance
 }

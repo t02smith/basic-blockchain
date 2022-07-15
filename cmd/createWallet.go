@@ -13,7 +13,7 @@ import (
 
 // createWalletCmd represents the createWallet command
 var createWalletCmd = &cobra.Command{
-	Use:   "createWallet",
+	Use:   "wallet",
 	Short: "Create a new wallet",
 	Long:  `Create a new wallet and add it to your collection of wallets`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -22,7 +22,7 @@ var createWalletCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(createWalletCmd)
+	createCmd.AddCommand(createWalletCmd)
 
 }
 

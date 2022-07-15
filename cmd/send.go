@@ -18,6 +18,19 @@ var sendCmd = &cobra.Command{
 	Short: "Send currency from one account to another",
 	Long:  `Send unspent currency from one account to another providing the sender has sufficient funds.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if from == "" {
+			from, _ = promptAddress("Choose an address to send from:")
+		}
+
+		if to == "" {
+			to, _ = promptAddress("Choose an address to send to:")
+		}
+
+		if amount == -1 {
+			amount = promptForTxnAmount()
+		}
+
 		send(from, to, amount)
 	},
 }
@@ -26,14 +39,9 @@ func init() {
 	rootCmd.AddCommand(sendCmd)
 
 	sendCmd.PersistentFlags().StringVarP(&from, "from", "f", "", "Address to send the currency from")
-	sendCmd.MarkPersistentFlagRequired("from")
-
 	sendCmd.PersistentFlags().StringVarP(&to, "to", "t", "", "Address to send the currency to")
-	sendCmd.MarkPersistentFlagRequired("to")
 
-	sendCmd.PersistentFlags().IntVarP(&amount, "amount", "a", 0, "Amount of currency to send")
-	sendCmd.MarkPersistentFlagRequired("amount")
-
+	sendCmd.PersistentFlags().IntVarP(&amount, "amount", "a", -1, "Amount of currency to send")
 }
 
 func send(from, to string, amount int) {

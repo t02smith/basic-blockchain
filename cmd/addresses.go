@@ -31,6 +31,7 @@ func listAddresses() {
 	addresses := wallets.GetAllAddresses()
 
 	for i, address := range addresses {
-		fmt.Printf("%d. %s\n", i+1, address)
+		balance := wallet.GetBalance(address)
+		fmt.Printf("%d. %s = %d\n", i+1, address, balance)
 	}
 }
