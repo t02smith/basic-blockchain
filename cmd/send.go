@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/t02smith/basic-blockchain/blockchain"
+	"github.com/t02smith/basic-blockchain/wallet"
 )
 
 var (
@@ -24,11 +25,12 @@ var sendCmd = &cobra.Command{
 		}
 
 		if to == "" {
-			to, _ = promptAddress("Choose an address to send to:")
+			to, _ = promptAddressButExclude("Choose an address to send to:", []string{from})
 		}
 
+		bal := wallet.GetBalance(from)
 		if amount == -1 {
-			amount = promptForTxnAmount()
+			amount = promptForTxnAmount(bal)
 		}
 
 		send(from, to, amount)

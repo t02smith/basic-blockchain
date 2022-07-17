@@ -23,20 +23,15 @@ go install github.com/t02smith/basic-blockchain
 basic-blockchain --help
 ```
 
+Typical usage will follow:
+
 ```bash
-A proof of work blockchain based upon the guide by Noah Hein.
+# 1. generate your wallets
+basic-blockchain create wallet -n 3
 
-Usage:
-  basic-blockchain [command]
+# 2. generate a new blockchain
+basic-blockchain create blockchain
 
-Available Commands:
-  balance     Get the balance at an address
-  completion  Generate the autocompletion script for the specified shell
-  create      Create a new blockchain
-  help        Help about any command
-  send        Send currency from one account to another
-  show        Print the blockchain
-
-Flags:
-  -h, --help   help for basic-blockchain
+# 3. send currency between your wallets
+basic-blockchain send
 ```

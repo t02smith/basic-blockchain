@@ -16,13 +16,8 @@ var createAddress string = ""
 // createBlockchainCmd represents the createBlockchain command
 var createBlockchainCmd = &cobra.Command{
 	Use:   "blockchain",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "create a new blockchain",
+	Long:  `Create a new blockchain and award a given address for the creation of the genesis block`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if createAddress == "" {
 			createAddress, _ = promptAddress("Choose an address to award for the creation of the genesis block")

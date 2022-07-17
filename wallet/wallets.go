@@ -69,6 +69,8 @@ func (ws *Wallets) AddWallet() string {
 	return address
 }
 
+// getters
+
 func (ws *Wallets) GetWallet(address string) *Wallet {
 	return ws.Wallets[address]
 }
@@ -81,4 +83,13 @@ func (ws *Wallets) GetAllAddresses() []string {
 	}
 
 	return addresses
+}
+
+func (ws *Wallets) GetAllAddressesAndBalance() map[string]int {
+	pairs := make(map[string]int)
+	for _, addr := range ws.GetAllAddresses() {
+		pairs[addr] = GetBalance(addr)
+	}
+
+	return pairs
 }

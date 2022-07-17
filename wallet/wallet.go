@@ -8,7 +8,6 @@ import (
 	"log"
 
 	"github.com/t02smith/basic-blockchain/blockchain"
-	"golang.org/x/crypto/ripemd160"
 )
 
 const (
@@ -17,6 +16,9 @@ const (
 	version byte = byte(0x00)
 )
 
+// GETTERS
+
+// generates the address of a wallet
 func (w *Wallet) Address() []byte {
 	pubHash := PublicKeyHash(w.PublicKey)
 	versionedHash := append([]byte{version}, pubHash...)
@@ -27,6 +29,9 @@ func (w *Wallet) Address() []byte {
 	return base58Encode(finalHash)
 }
 
+// CREATORS
+
+// creates a new wallet
 func MakeWallet() *Wallet {
 	private, public := NewKeyPair()
 	return &Wallet{
@@ -35,6 +40,7 @@ func MakeWallet() *Wallet {
 	}
 }
 
+// generates a new public/private key pair
 func NewKeyPair() (ecdsa.PrivateKey, []byte) {
 	curve := elliptic.P256()
 
@@ -48,10 +54,11 @@ func NewKeyPair() (ecdsa.PrivateKey, []byte) {
 	return *private, pub
 }
 
+// returns the hash of a given public key
 func PublicKeyHash(publicKey []byte) []byte {
 	hashedPublicKey := sha256.Sum256(publicKey)
 
-	hasher := ripemd160.New()
+	hasher := sha256.New()
 	_, err := hasher.Write(hashedPublicKey[:])
 	if err != nil {
 		log.Panicln(err)

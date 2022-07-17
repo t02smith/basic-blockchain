@@ -1,44 +1,15 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
-
-	"github.com/manifoldco/promptui"
-	"github.com/t02smith/basic-blockchain/wallet"
 )
 
-func promptAddress(text string) (string, error) {
-	wallets, _ := wallet.CreateWallet()
+func AddressesAndBalancesToString(pairs map[string]int) []string {
+	var output []string = []string{}
 
-	prompt := promptui.Select{
-		Label: text,
-		Items: wallets.GetAllAddresses(),
+	for addr, bal := range pairs {
+		output = append(output, fmt.Sprintf("%s = %d", addr, bal))
 	}
 
-	_, result, err := prompt.Run()
-	if err != nil {
-		fmt.Println("Failed to choose address.")
-		return "", err
-	}
-
-	return result, nil
-}
-
-func promptForTxnAmount() int {
-	prompt := promptui.Prompt{
-		Label: "Enter an amount to send: ",
-		Validate: func(s string) error {
-			_, err := strconv.ParseInt(s, 10, 64)
-			if err != nil {
-				return errors.New("invalid number")
-			}
-			return nil
-		},
-	}
-
-	result, _ := prompt.Run()
-	number, _ := strconv.ParseInt(result, 10, 64)
-	return int(number)
+	return output
 }
