@@ -5,10 +5,6 @@ import (
 	"encoding/gob"
 )
 
-// methods
-
-// static
-
 // generates a new block
 func CreateBlock(txns []*Transaction, prevHash []byte) *Block {
 	block := &Block{

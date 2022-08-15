@@ -2,7 +2,7 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package create
 
 import (
 	"errors"
@@ -15,6 +15,7 @@ import (
 )
 
 var walletAmount int
+var walletAlias string
 
 // createWalletCmd represents the createWallet command
 var createWalletCmd = &cobra.Command{
@@ -48,15 +49,16 @@ var createWalletCmd = &cobra.Command{
 }
 
 func init() {
-	createCmd.AddCommand(createWalletCmd)
+	CreateCmd.AddCommand(createWalletCmd)
 
 	createWalletCmd.PersistentFlags().IntVarP(&walletAmount, "amount", "n", 1, "The amount of new wallets to make")
+	createWalletCmd.PersistentFlags().StringVarP(&walletAlias, "alias", "a", "", "A contextual name for a wallet")
 }
 
 func createWallet() {
 	wallets, _ := wallet.CreateWallet()
-	address := wallets.AddWallet()
+	address := wallets.AddWallet(walletAlias)
 	wallets.SaveFile()
 
-	fmt.Printf("Wallet created with address %s\n", address)
+	fmt.Printf("Wallet created with address %s and alias '%s'\n", address, walletAlias)
 }

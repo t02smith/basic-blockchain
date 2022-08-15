@@ -32,11 +32,12 @@ func (w *Wallet) Address() []byte {
 // CREATORS
 
 // creates a new wallet
-func MakeWallet() *Wallet {
+func MakeWallet(alias string) *Wallet {
 	private, public := NewKeyPair()
 	return &Wallet{
 		PrivateKey: private,
 		PublicKey:  public,
+		Alias:      alias,
 	}
 }
 

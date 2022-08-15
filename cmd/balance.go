@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/t02smith/basic-blockchain/cmd/prompts"
 	"github.com/t02smith/basic-blockchain/wallet"
 )
 
@@ -16,7 +17,7 @@ var balanceCmd = &cobra.Command{
 	Long:  `Finds the total amount of unspent output from a given address' transactions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if balanceAddress == "" {
-			balanceAddress, _ = promptAddress("Choose an address to check the balance of:")
+			balanceAddress, _ = prompts.PromptAddress("Choose an address to check the balance of:")
 		}
 
 		getBalance(balanceAddress)

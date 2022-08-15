@@ -2,13 +2,14 @@
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 */
-package cmd
+package create
 
 import (
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/t02smith/basic-blockchain/blockchain"
+	"github.com/t02smith/basic-blockchain/cmd/prompts"
 )
 
 var createAddress string = ""
@@ -20,7 +21,12 @@ var createBlockchainCmd = &cobra.Command{
 	Long:  `Create a new blockchain and award a given address for the creation of the genesis block`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if createAddress == "" {
-			createAddress, _ = promptAddress("Choose an address to award for the creation of the genesis block")
+			var err error
+			createAddress, err = prompts.PromptAddress("Choose an address to award for the creation of the genesis block")
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 
 		createBlockChain(createAddress)
@@ -28,7 +34,7 @@ var createBlockchainCmd = &cobra.Command{
 }
 
 func init() {
-	createCmd.AddCommand(createBlockchainCmd)
+	CreateCmd.AddCommand(createBlockchainCmd)
 
 	createBlockchainCmd.PersistentFlags().StringVarP(&createAddress, "address", "a", "", "Address to send initial reward to")
 }

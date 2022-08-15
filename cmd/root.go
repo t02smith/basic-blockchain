@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/t02smith/basic-blockchain/cmd/create"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -18,4 +19,8 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.AddCommand(create.CreateCmd)
 }

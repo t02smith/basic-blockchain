@@ -1,4 +1,4 @@
-package cmd
+package prompts
 
 import (
 	"errors"
@@ -11,8 +11,12 @@ import (
 )
 
 // prompts a user to choose between the addresses in their wallet
-func promptAddress(text string) (string, error) {
+func PromptAddress(text string) (string, error) {
 	wallets, _ := wallet.CreateWallet()
+	if len(wallets.GetAllAddresses()) == 0 {
+		return "", errors.New("you must create a wallet first")
+	}
+
 	prompt := promptui.Select{
 		Label: text,
 		Items: wallets.GetAllAddresses(),
@@ -27,7 +31,7 @@ func promptAddress(text string) (string, error) {
 	return result, nil
 }
 
-func promptAddressButExclude(text string, exclude []string) (string, error) {
+func PromptAddressButExclude(text string, exclude []string) (string, error) {
 	wallets, _ := wallet.CreateWallet()
 
 	addresses := mapset.NewSet()
@@ -57,29 +61,18 @@ func promptAddressButExclude(text string, exclude []string) (string, error) {
 }
 
 //
+func PromptForTxnAmount(max int) (int, error) {
+	prompt, _ := IntegerPrompt("Enter an amount to send", 0, max)
 
-func numberPrompt(label string, min, max int) (*promptui.Prompt, error) {
-	if min >= max {
-		return &promptui.Prompt{}, errors.New("min must be smaller than max")
+	result, err := prompt.Run()
+	if err != nil {
+		return -1, err
 	}
 
-	return &promptui.Prompt{
-		Label: label,
-		Validate: func(s string) error {
-			res, err := strconv.ParseInt(s, 10, 32)
-			x := int(res)
-			if err != nil || x < min || x > max {
-				return errors.New("invalid number")
-			}
-			return nil
-		},
-	}, nil
-}
+	number, err := strconv.ParseInt(result, 10, 32)
+	if err != nil {
+		return -1, err
+	}
 
-func promptForTxnAmount(max int) int {
-	prompt, _ := numberPrompt("Enter an amount to send: ", 0, max)
-
-	result, _ := prompt.Run()
-	number, _ := strconv.ParseInt(result, 10, 32)
-	return int(number)
+	return int(number), nil
 }

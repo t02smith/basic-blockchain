@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/t02smith/basic-blockchain/blockchain"
+	"github.com/t02smith/basic-blockchain/cmd/prompts"
 	"github.com/t02smith/basic-blockchain/wallet"
 )
 
@@ -19,18 +20,31 @@ var sendCmd = &cobra.Command{
 	Short: "Send currency from one account to another",
 	Long:  `Send unspent currency from one account to another providing the sender has sufficient funds.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
 
 		if from == "" {
-			from, _ = promptAddress("Choose an address to send from:")
+			from, err = prompts.PromptAddress("Choose an address to send from:")
+			if err != nil {
+				fmt.Println("Error while choosing origin address.")
+				return
+			}
 		}
 
 		if to == "" {
-			to, _ = promptAddressButExclude("Choose an address to send to:", []string{from})
+			to, err = prompts.PromptAddressButExclude("Choose an address to send to:", []string{from})
+			if err != nil {
+				fmt.Println("Error choosing destination address.")
+				return
+			}
 		}
 
 		bal := wallet.GetBalance(from)
 		if amount == -1 {
-			amount = promptForTxnAmount(bal)
+			amount, err = prompts.PromptForTxnAmount(bal)
+			if err != nil {
+				fmt.Println("Error selecting amount to send.")
+				return
+			}
 		}
 
 		send(from, to, amount)

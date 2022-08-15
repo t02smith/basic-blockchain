@@ -31,6 +31,10 @@ func (ws *Wallets) SaveFile() {
 }
 
 func (ws *Wallets) LoadFile() error {
+	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
+		os.Mkdir("tmp", os.ModeDevice)
+	}
+
 	if _, err := os.Stat(WALLET_FILE); os.IsNotExist(err) {
 		return err
 	}
@@ -61,8 +65,8 @@ func CreateWallet() (*Wallets, error) {
 	return &wallets, err
 }
 
-func (ws *Wallets) AddWallet() string {
-	wallet := MakeWallet()
+func (ws *Wallets) AddWallet(alias string) string {
+	wallet := MakeWallet(alias)
 	address := string(wallet.Address())
 
 	ws.Wallets[address] = wallet

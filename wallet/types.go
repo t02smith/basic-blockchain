@@ -6,6 +6,7 @@ import "crypto/ecdsa"
 type Wallet struct {
 	PrivateKey ecdsa.PrivateKey
 	PublicKey  []byte
+	Alias      string
 }
 
 // each user may have many wallets for privacy
