@@ -18,12 +18,16 @@ var (
 var sendCmd = &cobra.Command{
 	Use:   "send",
 	Short: "Send currency from one account to another",
-	Long:  `Send unspent currency from one account to another providing the sender has sufficient funds.`,
+	Long: `Send unspent currency from one account to another providing the sender has sufficient funds.
+	A prompt will show up to help you choose the to and from addresses as well as the amount`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
 
 		if from == "" {
-			from, err = prompts.PromptAddress("Choose an address to send from:")
+			from, err = prompts.PromptAddressIf("Choose an address to send from:", func(address string) bool {
+				bal := wallet.GetBalance(address)
+				return bal > 0
+			})
 			if err != nil {
 				fmt.Println("Error while choosing origin address.")
 				return
@@ -31,7 +35,9 @@ var sendCmd = &cobra.Command{
 		}
 
 		if to == "" {
-			to, err = prompts.PromptAddressButExclude("Choose an address to send to:", []string{from})
+			to, err = prompts.PromptAddressIf("Choose an address to send to:", func(address string) bool {
+				return address != from
+			})
 			if err != nil {
 				fmt.Println("Error choosing destination address.")
 				return

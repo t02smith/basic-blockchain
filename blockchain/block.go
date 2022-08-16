@@ -6,7 +6,7 @@ import (
 )
 
 // generates a new block
-func CreateBlock(txns []*Transaction, prevHash []byte) *Block {
+func createBlock(txns []*Transaction, prevHash []byte) *Block {
 	block := &Block{
 		Hash:         []byte{},
 		Transactions: txns,
@@ -25,22 +25,22 @@ func CreateBlock(txns []*Transaction, prevHash []byte) *Block {
 
 // IO
 
-func (b *Block) Serialize() []byte {
+func (b *Block) serialize() []byte {
 	var res bytes.Buffer
 	encoder := gob.NewEncoder(&res)
 
 	err := encoder.Encode(b)
-	Handle(err)
+	handle(err)
 
 	return res.Bytes()
 }
 
-func Deserialize(data []byte) *Block {
+func deserialize(data []byte) *Block {
 	var b Block
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 
 	err := decoder.Decode(&b)
-	Handle(err)
+	handle(err)
 
 	return &b
 }

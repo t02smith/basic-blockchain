@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/t02smith/basic-blockchain/blockchain"
 	"github.com/t02smith/basic-blockchain/wallet"
 )
 
@@ -28,10 +29,20 @@ func init() {
 
 func listAddresses() {
 	wallets, _ := wallet.CreateWallet()
-	addresses := wallets.GetAllAddresses()
 
-	for i, address := range addresses {
-		balance := wallet.GetBalance(address)
-		fmt.Printf("%d. %s = %d\n", i+1, address, balance)
+	i := 1
+	if blockchain.BlockchainExists() {
+		for addr, w := range wallets.Wallets {
+			balance := wallet.GetBalance(addr)
+			fmt.Printf("%d. %s - %s => %d\n", i, w.Alias, addr, balance)
+			i++
+		}
+	} else {
+		fmt.Println("WARNING - No blockchain found")
+		for addr, w := range wallets.Wallets {
+			fmt.Printf("%d. %s - %s\n", i, w.Alias, addr)
+			i++
+		}
 	}
+
 }

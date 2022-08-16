@@ -19,7 +19,7 @@ func (tx *Transaction) SetID() {
 
 	encoder := gob.NewEncoder(&encoded)
 	err := encoder.Encode(tx)
-	Handle(err)
+	handle(err)
 
 	hash = sha256.Sum256(encoded.Bytes())
 	tx.ID = hash[:]
@@ -67,7 +67,7 @@ func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction
 	var outputs []TxnOutput
 
 	// find spendable outputs
-	acc, validOutputs := chain.FindSpendableOutputs(from, amount)
+	acc, validOutputs := chain.findSpendableOutputs(from, amount)
 
 	if acc < amount {
 		log.Panicln("Error: Not enough funds")
@@ -76,7 +76,7 @@ func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction
 	// generate inputs that point to the outputs being spent
 	for txid, outs := range validOutputs {
 		txID, err := hex.DecodeString(txid)
-		Handle(err)
+		handle(err)
 
 		for _, out := range outs {
 			input := TxnInput{

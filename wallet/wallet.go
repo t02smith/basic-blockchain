@@ -19,11 +19,11 @@ const (
 // GETTERS
 
 // generates the address of a wallet
-func (w *Wallet) Address() []byte {
-	pubHash := PublicKeyHash(w.PublicKey)
+func (w *Wallet) address() []byte {
+	pubHash := publicKeyHash(w.PublicKey)
 	versionedHash := append([]byte{version}, pubHash...)
 
-	checksum := Checksum(versionedHash)
+	checksum := checksum(versionedHash)
 	finalHash := append(versionedHash, checksum...)
 
 	return base58Encode(finalHash)
@@ -32,8 +32,8 @@ func (w *Wallet) Address() []byte {
 // CREATORS
 
 // creates a new wallet
-func MakeWallet(alias string) *Wallet {
-	private, public := NewKeyPair()
+func makeWallet(alias string) *Wallet {
+	private, public := newKeyPair()
 	return &Wallet{
 		PrivateKey: private,
 		PublicKey:  public,
@@ -42,7 +42,7 @@ func MakeWallet(alias string) *Wallet {
 }
 
 // generates a new public/private key pair
-func NewKeyPair() (ecdsa.PrivateKey, []byte) {
+func newKeyPair() (ecdsa.PrivateKey, []byte) {
 	curve := elliptic.P256()
 
 	private, err := ecdsa.GenerateKey(curve, rand.Reader)
@@ -56,7 +56,7 @@ func NewKeyPair() (ecdsa.PrivateKey, []byte) {
 }
 
 // returns the hash of a given public key
-func PublicKeyHash(publicKey []byte) []byte {
+func publicKeyHash(publicKey []byte) []byte {
 	hashedPublicKey := sha256.Sum256(publicKey)
 
 	hasher := sha256.New()
@@ -68,13 +68,15 @@ func PublicKeyHash(publicKey []byte) []byte {
 	return hasher.Sum(nil)
 }
 
-func Checksum(ripeMdHash []byte) []byte {
+// returns the checksum of a versioned hash
+func checksum(ripeMdHash []byte) []byte {
 	firstHash := sha256.Sum256(ripeMdHash)
 	secondHash := sha256.Sum256(firstHash[:])
 
 	return secondHash[:checksumLength]
 }
 
+// gets the balance at a given address
 func GetBalance(address string) int {
 	chain := blockchain.ContinueBlockChain(address)
 	defer chain.Database.Close()

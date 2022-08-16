@@ -19,47 +19,39 @@ func (chain *BlockChain) GenerateBlock(transactions []*Transaction) {
 
 	err := chain.Database.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte("lh"))
-		Handle(err)
+		handle(err)
 		err = item.Value(func(val []byte) error {
 			lastHash = val
 			return nil
 		})
-		Handle(err)
+		handle(err)
 		return err
 	})
-	Handle(err)
+	handle(err)
 
-	newBlock := CreateBlock(transactions, lastHash)
+	newBlock := createBlock(transactions, lastHash)
 	err = chain.Database.Update(func(txn *badger.Txn) error {
-		err = txn.Set(newBlock.Hash, newBlock.Serialize())
-		Handle(err)
+		err = txn.Set(newBlock.Hash, newBlock.serialize())
+		handle(err)
 		err = txn.Set([]byte("lh"), newBlock.Hash)
 
 		chain.LastHash = newBlock.Hash
 		return err
 	})
-	Handle(err)
+	handle(err)
 }
 
 // static
 
 // initial block for any blockchain
-func Genesis(coinbase *Transaction) *Block {
-	return CreateBlock([]*Transaction{coinbase}, []byte{})
-}
-
-func DbExists(db string) bool {
-	if _, err := os.Stat(db); os.IsNotExist(err) {
-		return false
-	}
-
-	return true
+func genesis(coinbase *Transaction) *Block {
+	return createBlock([]*Transaction{coinbase}, []byte{})
 }
 
 func CreateBlockChain(address string) *BlockChain {
 	var lastHash []byte
 
-	if DbExists(DB_FILE) {
+	if BlockchainExists() {
 		log.Println("Blockchain already exists")
 		runtime.Goexit()
 	}
@@ -68,22 +60,22 @@ func CreateBlockChain(address string) *BlockChain {
 	ops.Logger = nil
 
 	db, err := badger.Open(ops)
-	Handle(err)
+	handle(err)
 
 	err = db.Update(func(txn *badger.Txn) error {
 		cbtxn := CoinbaseTxn(address, GENESIS_DATA)
-		genesis := Genesis(cbtxn)
+		genesis := genesis(cbtxn)
 		log.Println("Genesis created")
 
-		err = txn.Set(genesis.Hash, genesis.Serialize())
-		Handle(err)
+		err = txn.Set(genesis.Hash, genesis.serialize())
+		handle(err)
 
 		err = txn.Set([]byte("lh"), genesis.Hash)
 		lastHash = genesis.Hash
 
 		return err
 	})
-	Handle(err)
+	handle(err)
 
 	chain := BlockChain{
 		LastHash: lastHash,
@@ -94,7 +86,7 @@ func CreateBlockChain(address string) *BlockChain {
 }
 
 func ContinueBlockChain(address string) *BlockChain {
-	if !DbExists(DB_FILE) {
+	if !BlockchainExists() {
 		fmt.Println("No blockchain found, please create one first")
 		runtime.Goexit()
 	}
@@ -104,22 +96,27 @@ func ContinueBlockChain(address string) *BlockChain {
 	opts := badger.DefaultOptions(DB_PATH)
 	opts.Logger = nil
 	db, err := badger.Open(opts)
-	Handle(err)
+	handle(err)
 
 	err = db.Update(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte("lh"))
-		Handle(err)
+		handle(err)
 		err = item.Value(func(val []byte) error {
 			lastHash = val
 			return nil
 		})
-		Handle(err)
+		handle(err)
 		return err
 	})
-	Handle(err)
+	handle(err)
 
 	chain := BlockChain{lastHash, db}
 	return &chain
+}
+
+func BlockchainExists() bool {
+	_, err := os.Stat(DB_FILE)
+	return !os.IsNotExist(err)
 }
 
 // ITERATOR
@@ -138,16 +135,16 @@ func (it *BlockChainIterator) Next() *Block {
 
 	err := it.Database.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(it.CurrentHash)
-		Handle(err)
+		handle(err)
 
 		err = item.Value(func(val []byte) error {
-			b = Deserialize(val)
+			b = deserialize(val)
 			return nil
 		})
-		Handle(err)
+		handle(err)
 		return err
 	})
-	Handle(err)
+	handle(err)
 
 	it.CurrentHash = b.PrevHash
 	return b
@@ -155,7 +152,7 @@ func (it *BlockChainIterator) Next() *Block {
 
 // HASHING
 
-func (b *Block) HashTransactions() []byte {
+func (b *Block) hashTransactions() []byte {
 	var txnHashes [][]byte
 	var txnHash [32]byte
 
@@ -170,7 +167,7 @@ func (b *Block) HashTransactions() []byte {
 // UXTOs
 
 // finds all unspent txns for a given address
-func (chain *BlockChain) FindUnspentTxns(address string) []Transaction {
+func (chain *BlockChain) findUnspentTxns(address string) []Transaction {
 	var uxtos []Transaction
 
 	spentTXNs := make(map[string][]int)
@@ -225,7 +222,7 @@ func (chain *BlockChain) FindUnspentTxns(address string) []Transaction {
 // finds UTXOs related to an address
 func (chain *BlockChain) FindUTXOs(address string) []TxnOutput {
 	var UTXOs []TxnOutput
-	unspent := chain.FindUnspentTxns(address)
+	unspent := chain.findUnspentTxns(address)
 
 	for _, tx := range unspent {
 		for _, out := range tx.Outputs {
@@ -238,9 +235,9 @@ func (chain *BlockChain) FindUTXOs(address string) []TxnOutput {
 	return UTXOs
 }
 
-func (chain *BlockChain) FindSpendableOutputs(address string, amount int) (int, map[string][]int) {
+func (chain *BlockChain) findSpendableOutputs(address string, amount int) (int, map[string][]int) {
 	unspentOuts := make(map[string][]int)
-	unspentTxns := chain.FindUnspentTxns(address)
+	unspentTxns := chain.findUnspentTxns(address)
 	accumulated := 0
 
 Work:

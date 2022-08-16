@@ -5,62 +5,99 @@ import (
 	"fmt"
 	"strconv"
 
-	mapset "github.com/deckarep/golang-set"
 	"github.com/manifoldco/promptui"
+	"github.com/t02smith/basic-blockchain/blockchain"
 	"github.com/t02smith/basic-blockchain/wallet"
 )
 
 // prompts a user to choose between the addresses in their wallet
 func PromptAddress(text string) (string, error) {
 	wallets, _ := wallet.CreateWallet()
-	if len(wallets.GetAllAddresses()) == 0 {
+	addrs := wallets.GetAllAddresses()
+	if len(addrs) == 0 {
 		return "", errors.New("you must create a wallet first")
 	}
 
-	prompt := promptui.Select{
-		Label: text,
-		Items: wallets.GetAllAddresses(),
+	bcExists := blockchain.BlockchainExists()
+
+	items := []string{}
+	for _, addr := range addrs {
+		w := wallets.Wallets[addr]
+
+		if !bcExists {
+			if len(w.Alias) > 0 {
+				items = append(items, fmt.Sprintf("%s %s", w.Alias, addr))
+			} else {
+				items = append(items, addr)
+			}
+
+			continue
+		}
+
+		bal := wallet.GetBalance(addr)
+		if len(w.Alias) > 0 {
+			items = append(items, fmt.Sprintf("%s %s => %d", w.Alias, addr, bal))
+		} else {
+			items = append(items, fmt.Sprintf("%s => %d", addr, bal))
+		}
 	}
 
-	_, result, err := prompt.Run()
+	prompt := promptui.Select{
+		Label: text,
+		Items: items,
+	}
+
+	i, _, err := prompt.Run()
 	if err != nil {
 		fmt.Println("Failed to choose address.")
 		return "", err
 	}
 
-	return result, nil
+	return addrs[i], nil
 }
 
-func PromptAddressButExclude(text string, exclude []string) (string, error) {
-	wallets, _ := wallet.CreateWallet()
-
-	addresses := mapset.NewSet()
-	for _, addr := range wallets.GetAllAddresses() {
-		addresses.Add(addr)
+// Prompt the user to choose an address but only show addresses that satisfy a predicate
+func PromptAddressIf(text string, predicate func(address string) bool) (string, error) {
+	if !blockchain.BlockchainExists() {
+		return "", errors.New("no blockchain found")
 	}
 
-	excludeSet := mapset.NewSet()
-	for _, excl := range exclude {
-		excludeSet.Add(excl)
+	wallets, err := wallet.CreateWallet()
+	if err != nil {
+		return "", err
 	}
 
-	addressArr := addresses.Difference(excludeSet).ToSlice()
+	addrs, items, keptAddrs := wallets.GetAllAddresses(), []string{}, []string{}
+
+	for _, addr := range addrs {
+		if predicate(addr) {
+			w := wallets.Wallets[addr]
+			keptAddrs = append(keptAddrs, addr)
+			bal := wallet.GetBalance(addr)
+			if len(w.Alias) > 0 {
+				items = append(items, fmt.Sprintf("%s %s => %d", w.Alias, addr, bal))
+			} else {
+				items = append(items, fmt.Sprintf("%s => %d", addr, bal))
+			}
+		}
+	}
 
 	prompt := promptui.Select{
 		Label: text,
-		Items: addressArr,
+		Items: items,
 	}
 
-	_, result, err := prompt.Run()
+	i, _, err := prompt.Run()
 	if err != nil {
 		fmt.Println("Failed to choose address.")
 		return "", err
 	}
 
-	return result, nil
+	return keptAddrs[i], nil
+
 }
 
-//
+// Prompt the user to choose an amount of coin to send from an address
 func PromptForTxnAmount(max int) (int, error) {
 	prompt, _ := IntegerPrompt("Enter an amount to send", 0, max)
 

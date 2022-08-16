@@ -30,7 +30,7 @@ func (ws *Wallets) SaveFile() {
 	}
 }
 
-func (ws *Wallets) LoadFile() error {
+func (ws *Wallets) loadFile() error {
 	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
 		os.Mkdir("tmp", os.ModeDevice)
 	}
@@ -61,23 +61,19 @@ func CreateWallet() (*Wallets, error) {
 		Wallets: make(map[string]*Wallet),
 	}
 
-	err := wallets.LoadFile()
+	err := wallets.loadFile()
 	return &wallets, err
 }
 
 func (ws *Wallets) AddWallet(alias string) string {
-	wallet := MakeWallet(alias)
-	address := string(wallet.Address())
+	wallet := makeWallet(alias)
+	address := string(wallet.address())
 
 	ws.Wallets[address] = wallet
 	return address
 }
 
 // getters
-
-func (ws *Wallets) GetWallet(address string) *Wallet {
-	return ws.Wallets[address]
-}
 
 func (ws *Wallets) GetAllAddresses() []string {
 	var addresses []string
@@ -87,13 +83,4 @@ func (ws *Wallets) GetAllAddresses() []string {
 	}
 
 	return addresses
-}
-
-func (ws *Wallets) GetAllAddressesAndBalance() map[string]int {
-	pairs := make(map[string]int)
-	for _, addr := range ws.GetAllAddresses() {
-		pairs[addr] = GetBalance(addr)
-	}
-
-	return pairs
 }

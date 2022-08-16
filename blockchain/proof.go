@@ -56,9 +56,9 @@ func CreateNonce(pow *ProofOfWork, nonce int) []byte {
 	data := bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
-			pow.Block.HashTransactions(),
-			ToHex(int64(nonce)),
-			ToHex(int64(DIFFICULTY)),
+			pow.Block.hashTransactions(),
+			toHex(int64(nonce)),
+			toHex(int64(DIFFICULTY)),
 		},
 		[]byte{},
 	)
