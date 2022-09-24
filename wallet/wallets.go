@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/elliptic"
 	"encoding/gob"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -83,4 +84,14 @@ func (ws *Wallets) GetAllAddresses() []string {
 	}
 
 	return addresses
+}
+
+func (ws *Wallets) GetPublicKey(address string) ([]byte, error) {
+
+	if wallet, ok := ws.Wallets[address]; !ok {
+		return []byte{}, fmt.Errorf("Wallet not found with address %x", address)
+	} else {
+		return wallet.PublicKey, nil
+	}
+
 }

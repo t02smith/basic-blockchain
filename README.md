@@ -2,6 +2,8 @@
 
 A basic proof of work blockchain based upon [this guide](https://dev.to/nheindev/build-the-hello-world-of-blockchain-in-go-bli) by Noah Hein.
 
+> Project based in Go 1.16
+
 ![Go Badge](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=fff&style=for-the-badge)
 
 ## Installation
